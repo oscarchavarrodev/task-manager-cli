@@ -1,10 +1,10 @@
 from uuid import UUID
 
-from task_manager.application.ports.task_repository import TaskRepository
 from task_manager.domain.task import Task
+from task_manager.application.ports.task_repository import TaskRepository
 
 
-class CompleteTaskUseCase:
+class GetTaskUseCase:
     def __init__(self, repository: TaskRepository) -> None:
         self.repository = repository
 
@@ -12,10 +12,6 @@ class CompleteTaskUseCase:
         task = self.repository.get_by_id(task_id)
 
         if task is None:
-            raise ValueError("Task not found")
-
-        task.complete()
-
-        self.repository.save(task)
+            raise ValueError(f"Task with id {task_id} not found")
 
         return task

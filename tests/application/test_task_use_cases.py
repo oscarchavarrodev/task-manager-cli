@@ -1,14 +1,14 @@
 import pytest
 
-from task_manager.application.complete_task import CompleteTaskUseCase
-from task_manager.application.create_task import CreateTaskUseCase
 from task_manager.domain.enums import TaskStatus
 
 
-def test_should_create_task_with_pending_status() -> None:
-    use_case = CreateTaskUseCase()
+# =========================
+# CREATE TASK
+# =========================
 
-    task = use_case.execute(
+def test_should_create_task_with_pending_status(create_use_case) -> None:
+    task = create_use_case.execute(
         title="Learn DDD",
         description="Study clean architecture",
     )
@@ -18,28 +18,80 @@ def test_should_create_task_with_pending_status() -> None:
     assert task.status == TaskStatus.PENDING
 
 
-def test_should_complete_task_successfully() -> None:
-    task = CreateTaskUseCase().execute(
+# =========================
+# COMPLETE TASK
+# =========================
+
+def test_should_complete_task_successfully(create_use_case, complete_use_case) -> None:
+    task = create_use_case.execute(
         title="Learn DDD",
         description="Study clean architecture",
     )
 
-    use_case = CompleteTaskUseCase()
-
-    updated_task = use_case.execute(task)
+    updated_task = complete_use_case.execute(task.id)
 
     assert updated_task.status == TaskStatus.COMPLETED
 
 
-def test_should_not_complete_task_twice() -> None:
-    task = CreateTaskUseCase().execute(
+def test_should_not_complete_task_twice(create_use_case, complete_use_case) -> None:
+    task = create_use_case.execute(
         title="Learn Python",
         description="OOP practice",
     )
 
-    use_case = CompleteTaskUseCase()
-
-    use_case.execute(task)
+    complete_use_case.execute(task.id)
 
     with pytest.raises(ValueError):
-        use_case.execute(task)
+        complete_use_case.execute(task.id)
+
+
+# =========================
+# GET TASK
+# =========================
+
+def test_should_get_task_by_id(create_use_case, get_use_case) -> None:
+    task = create_use_case.execute(
+        title="Learn Clean Architecture",
+        description="Study use cases",
+    )
+
+    found_task = get_use_case.execute(task.id)
+
+    assert found_task.id == task.id
+    assert found_task.title == "Learn Clean Architecture"
+
+
+def test_should_raise_error_when_task_not_found(get_use_case) -> None:
+    import uuid
+
+    with pytest.raises(ValueError):
+        get_use_case.execute(uuid.uuid4())
+
+
+# =========================
+# DELETE TASK
+# =========================
+
+def test_should_delete_task_successfully(create_use_case, delete_use_case,get_use_case) -> None:
+    task = create_use_case.execute(
+        title="Task to delete",
+        description="Delete me",
+    )
+
+    delete_use_case.execute(task.id)
+
+    # verify it no longer exists
+    with pytest.raises(ValueError):
+        get_use_case.execute(task.id)
+
+
+def test_should_not_delete_completed_task(create_use_case, complete_use_case, delete_use_case):
+    task = create_use_case.execute(
+        title="Important task",
+        description="Cannot delete this",
+    )
+
+    complete_use_case.execute(task.id)
+
+    with pytest.raises(ValueError):
+        delete_use_case.execute(task.id)
