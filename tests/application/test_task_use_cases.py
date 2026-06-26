@@ -2,10 +2,10 @@ import pytest
 
 from task_manager.domain.enums import TaskStatus
 
-
 # =========================
 # CREATE TASK
 # =========================
+
 
 def test_should_create_task_with_pending_status(create_use_case) -> None:
     task = create_use_case.execute(
@@ -21,6 +21,7 @@ def test_should_create_task_with_pending_status(create_use_case) -> None:
 # =========================
 # COMPLETE TASK
 # =========================
+
 
 def test_should_complete_task_successfully(create_use_case, complete_use_case) -> None:
     task = create_use_case.execute(
@@ -49,6 +50,7 @@ def test_should_not_complete_task_twice(create_use_case, complete_use_case) -> N
 # GET TASK
 # =========================
 
+
 def test_should_get_task_by_id(create_use_case, get_use_case) -> None:
     task = create_use_case.execute(
         title="Learn Clean Architecture",
@@ -72,7 +74,10 @@ def test_should_raise_error_when_task_not_found(get_use_case) -> None:
 # DELETE TASK
 # =========================
 
-def test_should_delete_task_successfully(create_use_case, delete_use_case,get_use_case) -> None:
+
+def test_should_delete_task_successfully(
+    create_use_case, delete_use_case, get_use_case
+) -> None:
     task = create_use_case.execute(
         title="Task to delete",
         description="Delete me",
@@ -85,7 +90,9 @@ def test_should_delete_task_successfully(create_use_case, delete_use_case,get_us
         get_use_case.execute(task.id)
 
 
-def test_should_not_delete_completed_task(create_use_case, complete_use_case, delete_use_case):
+def test_should_not_delete_completed_task(
+    create_use_case, complete_use_case, delete_use_case
+):
     task = create_use_case.execute(
         title="Important task",
         description="Cannot delete this",
