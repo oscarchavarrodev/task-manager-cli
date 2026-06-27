@@ -76,7 +76,9 @@ def test_should_raise_error_when_task_not_found(get_use_case) -> None:
 
 
 def test_should_delete_task_successfully(
-    create_use_case, delete_use_case, get_use_case
+    create_use_case,
+    delete_use_case,
+    get_use_case,
 ) -> None:
     task = create_use_case.execute(
         title="Task to delete",
@@ -85,14 +87,15 @@ def test_should_delete_task_successfully(
 
     delete_use_case.execute(task.id)
 
-    # verify it no longer exists
     with pytest.raises(ValueError):
         get_use_case.execute(task.id)
 
 
 def test_should_not_delete_completed_task(
-    create_use_case, complete_use_case, delete_use_case
-):
+    create_use_case,
+    complete_use_case,
+    delete_use_case,
+) -> None:
     task = create_use_case.execute(
         title="Important task",
         description="Cannot delete this",
@@ -102,3 +105,37 @@ def test_should_not_delete_completed_task(
 
     with pytest.raises(ValueError):
         delete_use_case.execute(task.id)
+
+
+# =========================
+# LIST TASKS
+# =========================
+
+
+def test_should_list_all_tasks(
+    create_use_case,
+    list_use_case,
+) -> None:
+    create_use_case.execute(
+        title="Task 1",
+        description="First task",
+    )
+
+    create_use_case.execute(
+        title="Task 2",
+        description="Second task",
+    )
+
+    tasks = list_use_case.execute()
+
+    assert len(tasks) == 2
+    assert tasks[0].title == "Task 1"
+    assert tasks[1].title == "Task 2"
+
+
+def test_should_return_empty_list_when_no_tasks_exist(
+    list_use_case,
+) -> None:
+    tasks = list_use_case.execute()
+
+    assert tasks == []

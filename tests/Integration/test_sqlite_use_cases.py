@@ -70,9 +70,9 @@ def test_should_get_task_using_sqlite_repository(
     assert found_task.description == task.description
 
 
-def test_should_get_all_tasks_using_sqlite_repository(
+def test_should_list_all_tasks_using_sqlite_repository(
     create_use_case,
-    repository,
+    list_use_case,
 ) -> None:
     task1 = create_use_case.execute(
         title="Task 1",
@@ -84,12 +84,21 @@ def test_should_get_all_tasks_using_sqlite_repository(
         description="Second task",
     )
 
-    tasks = repository.get_all()
+    tasks = list_use_case.execute()
 
     task_ids = [task.id for task in tasks]
 
+    assert len(tasks) == 2
     assert task1.id in task_ids
     assert task2.id in task_ids
+
+
+def test_should_return_empty_list_when_database_has_no_tasks(
+    list_use_case,
+) -> None:
+    tasks = list_use_case.execute()
+
+    assert tasks == []
 
 
 def test_should_not_delete_completed_task_using_sqlite_repository(

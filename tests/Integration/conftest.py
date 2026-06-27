@@ -4,6 +4,7 @@ from task_manager.application.complete_task import CompleteTaskUseCase
 from task_manager.application.create_task import CreateTaskUseCase
 from task_manager.application.delete_task import DeleteTaskUseCase
 from task_manager.application.get_task import GetTaskUseCase
+from task_manager.application.list_tasks import ListTasksUseCase
 from task_manager.infrastructure.persistence.sqlite_task_repository import (
     SqliteTaskRepository,
 )
@@ -38,3 +39,8 @@ def delete_use_case(repository):
 @pytest.fixture
 def get_use_case(repository):
     return GetTaskUseCase(repository)
+
+
+@pytest.fixture
+def list_use_case(repository):
+    return ListTasksUseCase(repository)
